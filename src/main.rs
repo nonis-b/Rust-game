@@ -5,7 +5,7 @@ use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
-use sdl2::image::{InitFlag, LoadTexture};
+use sdl2::image::{LoadTexture};
 use sdl2::rect::{Rect};
  
 struct Vec2 {
@@ -25,13 +25,20 @@ struct Sprite<'a> {
     tex: &'a Texture<'a>,
 }
 
+fn update(obj: &mut Sprite, delta_seconds: f32) {
+    obj.pos.x += 20.0 * delta_seconds;
+    if obj.pos.x > 800.0 {
+        obj.pos.x = 0.0;
+    }
+}
+
 pub fn main() {
+    let delta_seconds = 1.0 / 60.0;
     let mut objs = Vec::new();
     let png = "res/can.png";
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
-    let _image_context = sdl2::image::init(InitFlag::PNG | InitFlag::JPG);
- 
+
     let window = video_subsystem.window("rust-sdl2 demo", 800, 600)
         .position_centered()
         .build()
@@ -54,6 +61,11 @@ pub fn main() {
     let mut i = 0;
     'running: loop {
         i = (i + 1) % 255;
+
+        for o in &mut objs {
+            update(o, delta_seconds);
+        }
+
         canvas.set_draw_color(Color::RGB(i, 64, 255 - i));
         canvas.clear();
 
