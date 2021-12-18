@@ -1,7 +1,9 @@
 extern crate sdl2; 
 
+use crate::vec2::Vec2;
+use crate::sprite::Sprite;
 use crate::frame_stats::FrameStats;
-use sdl2::render::Texture;
+
 use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -9,24 +11,11 @@ use sdl2::image::{LoadTexture};
 use sdl2::rect::{Rect};
 use std::time::Duration;
 
+mod vec2;
 mod frame_stats;
+mod sprite;
 
-struct Vec2 {
-    x: f32,
-    y: f32,
-}
-
-impl Vec2 {
-    fn new(x: f32, y: f32) -> Vec2 {
-        return Vec2{x: x, y: y};
-    }
-}
-
-struct Sprite<'a> {
-    pos: Vec2,
-    size: Vec2,
-    tex: &'a Texture<'a>,
-}
+const DELTA_SECONDS: f32 = 1.0 / 60.0;
 
 fn update(obj: &mut Sprite, delta_seconds: f32) {
     obj.pos.x += 20.0 * delta_seconds;
@@ -34,8 +23,6 @@ fn update(obj: &mut Sprite, delta_seconds: f32) {
         obj.pos.x = 0.0;
     }
 }
-
-const DELTA_SECONDS: f32 = 1.0 / 60.0;
 
 pub fn main() {
     let mut frame_stats = FrameStats::init();
