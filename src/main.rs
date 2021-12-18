@@ -1,12 +1,32 @@
 extern crate sdl2; 
 
+use sdl2::render::Texture;
 use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
 use sdl2::image::{InitFlag, LoadTexture};
+use sdl2::rect::{Rect};
  
+struct Vec2 {
+    x: f32,
+    y: f32,
+}
+
+impl Vec2 {
+    fn new(x: f32, y: f32) -> Vec2 {
+        return Vec2{x: x, y: y};
+    }
+}
+
+struct Sprite<'a> {
+    pos: Vec2,
+    size: Vec2,
+    tex: &'a Texture<'a>,
+}
+
 pub fn main() {
+    let mut objs = Vec::new();
     let png = "res/can.png";
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
@@ -21,6 +41,12 @@ pub fn main() {
     let texture_creator = canvas.texture_creator();
     let texture = texture_creator.load_texture(png).unwrap();
  
+    objs.push(Sprite{
+        pos: Vec2::new(10.0, 100.0),
+        size: Vec2::new(50.0, 50.0),
+        tex: &texture
+    });
+
     canvas.set_draw_color(Color::RGB(0, 255, 255));
     canvas.clear();
     canvas.present();
@@ -30,7 +56,13 @@ pub fn main() {
         i = (i + 1) % 255;
         canvas.set_draw_color(Color::RGB(i, 64, 255 - i));
         canvas.clear();
-        canvas.copy(&texture, None, None).unwrap();
+
+        for o in &objs {
+            canvas.copy(o.tex, None, Rect::new(
+                o.pos.x as i32, o.pos.y as i32, 
+                o.size.x as u32, o.size.y as u32)).unwrap();
+        }
+
         canvas.present();
         for event in event_pump.poll_iter() {
             match event {
@@ -43,7 +75,7 @@ pub fn main() {
         }
         // The rest of the game loop goes here...
 
-        canvas.present();
+        //canvas.present();
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
 }
